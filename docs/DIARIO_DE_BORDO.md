@@ -51,7 +51,7 @@ Outra correção relevante: presumi que uma biblioteca popular leria a planilha 
 ## Ferramentas de IA usadas
 
 - **Para construir:** Claude Code (modelo Claude Opus 5.5) com o plugin ECC (regras de estilo, TDD e revisão, e o hook GateGuard, que pede justificativa antes de criar arquivos e rodar comandos destrutivos). Revisões finais feitas com os agentes `code-reviewer` e `security-reviewer` do ECC.
-- **Dentro do produto:** Claude via API (opcional, `ANTHROPIC_API_KEY`) para ler atas e redigir o resumo pessoal, sempre atrás do validador determinístico. Sem chave, o leitor por regras assume.
+- **Dentro do produto:** Claude Haiku 4.5 via API (opcional, `ANTHROPIC_API_KEY`) para ler atas e redigir o resumo pessoal, sempre atrás do validador determinístico. Sem chave, o leitor por regras assume.
 
 ## Fora do escopo e próximos passos
 
