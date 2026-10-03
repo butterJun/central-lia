@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { ClaudeNarrator } from '../src/server/digest/narrative.ts';
-import { ClaudeAnalyzer, EXTRACTION_SYSTEM_PROMPT, buildUserMessage, type ClaudeMessagesClient } from '../src/server/suggestions/claude-analyzer.ts';
+import { ClaudeAnalyzer, EXTRACTION_SYSTEM_PROMPT, buildUserMessage, supportsEffort, type ClaudeMessagesClient } from '../src/server/suggestions/claude-analyzer.ts';
 import type { RawProposal } from '../src/server/suggestions/contract.ts';
 import { LATER_DIR, copyFixture, createLoadedWorld, type TestWorld } from './helpers.ts';
 
@@ -57,6 +57,17 @@ describe('Claude analyzer', () => {
     const [suggestion] = world.container.suggestionService.list(['pending']);
     expect(suggestion).toMatchObject({ generator: 'Claude (claude-opus-5-5)', proposed: { dueDate: '2026-10-07' } });
     expect(suggestion?.proposed.ownerIds).toBeUndefined();
+  });
+
+  it('uses the economical default model without the effort parameter it does not accept', async () => {
+    const { client, requests } = fakeClaude({ stop_reason: 'end_turn', parsed_output: { proposals: [] } });
+    world = await createLoadedWorld({ analyzer: new ClaudeAnalyzer(client, 'claude-haiku-4-5') });
+    const request = requests.at(-1) as { model: string; output_config: Record<string, unknown> };
+    expect(request.model).toBe('claude-haiku-4-5');
+    expect(request.output_config).not.toHaveProperty('effort');
+    expect(request.output_config.format).toBeDefined();
+    expect(supportsEffort('claude-haiku-4-5')).toBe(false);
+    expect(supportsEffort('claude-sonnet-5-5')).toBe(true);
   });
 
   it('only analyzes minutes, not direction or historical documents', async () => {

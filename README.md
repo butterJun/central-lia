@@ -87,7 +87,7 @@ Esse passo edita uma ata já conhecida.
    npm start
    ```
 
-6. Abra **Estado da sincronização → Conectar Google Drive** e autorize. Depois, adicione as atas **diretamente no Drive**. Converta `Ata_2026-10-03.docx` em Google Docs, como pede o pacote.
+6. Abra **Estado da sincronização → Conectar Google Drive** e autorize. Se o Google responder `403 access_denied`, a conta não está em **Público-alvo → Usuários de teste**: adicione-a e confira se ela aparece na lista depois de salvar. Depois, adicione as atas **diretamente no Drive**. Converta `Ata_2026-10-03.docx` em Google Docs, como pede o pacote.
 
 Detalhes do acesso:
 
@@ -170,7 +170,7 @@ Detalhes em [docs/adr/0002](docs/adr/0002-sincronizacao-por-varredura.md).
 Detalhes em [docs/adr/0003](docs/adr/0003-ia-com-validacao-deterministica.md).
 
 - **Leitura assistida de atas:**
-  - com `ANTHROPIC_API_KEY`, usa Claude (`claude-opus-5-5`, esforço baixo, saída estruturada);
+  - com `ANTHROPIC_API_KEY`, usa Claude com saída estruturada. O modelo padrão é o **Claude Haiku 4.5** (`claude-haiku-4-5`), o mais econômico da linha atual: extrair campos de atas curtas não exige raciocínio profundo, e o validador determinístico compensa erros eventuais. Outro modelo pode ser escolhido em `AI_MODEL` (nos modelos que aceitam, usa esforço baixo);
   - sem chave, se a API falhar ou se o modelo recusar, usa um leitor por regras com o mesmo contrato.
 - **Validador determinístico:** toda proposta passa por ele.
   - A evidência precisa existir **literalmente** no documento.
@@ -182,15 +182,15 @@ Detalhes em [docs/adr/0003](docs/adr/0003-ia-com-validacao-deterministica.md).
 - **Resumo "o que mudou para mim":** os fatos vêm dos registros, separados em confirmados, propostas pendentes e incertos, sempre com links. O texto corrido é opcional, escrito por Claude ou por um modelo fixo, e é descartado se citar uma data que não está nos registros.
 - **Revisão:** só perfis revisores (Bruno e Carla) aplicam sugestões. Aplicar duas vezes, aplicar uma sugestão substituída ou aplicar por cima de uma edição humana mais nova é recusado.
 
-### Custo estimado por uso (Claude Opus 5.5: US$ 4 por milhão de tokens de entrada e US$ 20 por milhão de saída)
+### Custo estimado por uso (Claude Haiku 4.5: US$ 1 por milhão de tokens de entrada e US$ 5 por milhão de saída)
 
 | Operação | Tokens aproximados | Custo aproximado |
 |---|---|---|
-| Ler uma ata nova ou alterada | 2–4 mil de entrada e 0,5–1,5 mil de saída | US$ 0,02–0,05 |
-| Resumo em texto (sob demanda) | ~2 mil de entrada e ~0,4 mil de saída | ~US$ 0,02 |
-| Mês típico da Liga (30 documentos e 200 resumos) | — | ~US$ 5 |
+| Ler uma ata nova ou alterada | 2–4 mil de entrada e 0,5–1,5 mil de saída | US$ 0,005–0,012 |
+| Resumo em texto (sob demanda) | ~2 mil de entrada e ~0,4 mil de saída | ~US$ 0,004 |
+| Mês típico da Liga (30 documentos e 200 resumos) | — | ~US$ 1 |
 
-A análise só roda quando o texto de um documento muda. Com `AI_MODEL=claude-haiku-4-5`, o custo cai cerca de 4 vezes. Sem chave, o custo é zero (leitor por regras).
+A análise só roda quando o texto de um documento muda. Para comparação, o mesmo mês custaria cerca de US$ 2 com o Claude Sonnet 5.5 (`claude-sonnet-5-5`) e cerca de US$ 5 com o Claude Opus 5.5 (`claude-opus-5-5`). Sem chave, o custo é zero e o produto usa o leitor por regras.
 
 ---
 
@@ -232,9 +232,7 @@ npm run test:coverage
 
 ## Limitações conhecidas
 
-- **Não validado contra credenciais reais nesta entrega:**
-  - a integração com o Google Drive real foi testada com um cliente falso;
-  - o caminho do Claude foi testado com um cliente falso (nenhuma chave foi usada no desenvolvimento).
+- **Claude não validado com a API real:** o caminho do Claude foi testado com um cliente falso; nenhuma chamada foi feita à API durante o desenvolvimento. A integração com o Google Drive real foi validada (veja [docs/VALIDACAO.md](docs/VALIDACAO.md)).
 - **Leitor por regras:** só entende padrões explícitos (IDs, nomes com verbo no futuro, datas ISO, "Próximo passo:"). Atas muito livres, sem chave de API, geram menos sugestões, mas nunca sugestões sem lastro.
 - **Datas relativas:** "até sexta" fica como prazo a definir (decisão intencional da especificação).
 - **Modo pasta local:** renomear um arquivo gera um ID novo. No Drive real o ID é estável.

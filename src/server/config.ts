@@ -26,7 +26,7 @@ const envSchema = z.object({
   APP_SECRET: optionalString,
   SYNC_INTERVAL_SECONDS: z.coerce.number().int().min(15).max(600).default(120),
   AI_PROVIDER: z.enum(['auto', 'claude', 'heuristic']).default('auto'),
-  AI_MODEL: z.string().default('claude-opus-5-5'),
+  AI_MODEL: z.string().default('claude-haiku-4-5'),
   ANTHROPIC_API_KEY: optionalString,
   REGISTRY_FILE_NAME: optionalString,
 });

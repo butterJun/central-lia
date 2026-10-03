@@ -42,7 +42,7 @@ describe('configuration', () => {
   });
 
   it('uses Claude only with a key, and refuses AI_PROVIDER=claude without one', () => {
-    expect(loadConfig({ ANTHROPIC_API_KEY: 'sk-test' }, [], ROOT).ai).toMatchObject({ provider: 'claude', model: 'claude-opus-5-5' });
+    expect(loadConfig({ ANTHROPIC_API_KEY: 'sk-test' }, [], ROOT).ai).toMatchObject({ provider: 'claude', model: 'claude-haiku-4-5' });
     expect(loadConfig({ ANTHROPIC_API_KEY: 'sk-test', AI_PROVIDER: 'heuristic' }, [], ROOT).ai.provider).toBe('heuristic');
     expect(() => loadConfig({ AI_PROVIDER: 'claude' }, [], ROOT)).toThrow(/exige ANTHROPIC_API_KEY/);
     expect(() => loadConfig({ SYNC_INTERVAL_SECONDS: '5' }, [], ROOT)).toThrow(/Configuração inválida/);

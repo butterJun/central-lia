@@ -49,7 +49,7 @@ export class ClaudeAnalyzer implements MinutesAnalyzer {
       model: this.model,
       max_tokens: 16000,
       system: EXTRACTION_SYSTEM_PROMPT,
-      output_config: { effort: 'low', format: zodOutputFormat(analyzerOutputSchema) },
+      output_config: { ...effortConfig(this.model), format: zodOutputFormat(analyzerOutputSchema) },
       messages: [{ role: 'user', content: buildUserMessage(input) }],
     });
     if (response.stop_reason === 'refusal') throw new Error('o modelo recusou a solicitação');
@@ -58,6 +58,18 @@ export class ClaudeAnalyzer implements MinutesAnalyzer {
     if (!parsed) throw new Error('resposta do modelo fora do formato esperado');
     return { proposals: parsed.proposals, generator: this.name, warnings: [] };
   }
+}
+
+/** Claude Haiku 4.5 and the 4.5-and-older models reject `output_config.effort` (HTTP 400). */
+const MODELS_WITHOUT_EFFORT = /claude-(haiku-4-5|sonnet-4-5|opus-4-1|opus-4-0|sonnet-4-0|3-)/;
+
+export function supportsEffort(model: string): boolean {
+  return !MODELS_WITHOUT_EFFORT.test(model);
+}
+
+/** Low effort where supported: extraction from short minutes does not need deep reasoning. */
+export function effortConfig(model: string): { effort?: 'low' } {
+  return supportsEffort(model) ? { effort: 'low' } : {};
 }
 
 export function buildUserMessage(input: AnalyzerInput): string {

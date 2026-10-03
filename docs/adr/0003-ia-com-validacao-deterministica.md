@@ -10,7 +10,7 @@ O case pede IA para (1) ler atas e sugerir criação/atualização de atividades
 
 1. **Contrato único** (`src/server/suggestions/contract.ts`), equivalente à seção 6 da especificação: `kind`, `target_activity_id`, `title`, `owners`, `due_date`, `next_step`, `status`, `evidence`, `reason`, `uncertainties`.
 2. **Dois leitores com o mesmo contrato:**
-   - **Claude** (`AI_MODEL`, padrão `claude-opus-5-5`, esforço `low`) via *structured outputs* com esquema Zod. O documento vai dentro de `<documento>` e o prompt de sistema diz que ele é dado, não instrução.
+   - **Claude** (`AI_MODEL`, padrão `claude-haiku-4-5`, o modelo atual mais econômico; esforço `low` nos modelos que aceitam o parâmetro) via *structured outputs* com esquema Zod. O documento vai dentro de `<documento>` e o prompt de sistema diz que ele é dado, não instrução.
    - **Leitor por regras** (determinístico), usado quando não há chave, quando a API falha ou quando o modelo recusa. Ele reconhece IDs `ACT-*`, "Fulano + verbo no futuro", datas ISO, "Próximo passo:", "de X para Y" e palavras de hipótese ("talvez", "ninguém assumiu").
 3. **Validador determinístico obrigatório** (`validator.ts`) para as duas saídas. Uma proposta só vira sugestão se:
    - a evidência existir **literalmente** no documento;

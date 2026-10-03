@@ -57,7 +57,13 @@ Rodei uma revisão de código e uma de segurança com os agentes `code-reviewer`
 | Mensagens de erro de SDKs podiam conter URLs e tokens | Baixa | Mensagens higienizadas e limitadas |
 | IDs repetidos ou linhas incompletas na planilha sumiam em silêncio | Baixa | Viram conflito visível |
 
+## Validação com o Google Drive real (2026-10-03)
+
+Projeto próprio no Google Cloud ("Central LIA case teste"), cliente OAuth Web, app em modo Testing e escopo `drive.readonly`. A pasta "LIA case teste" recebeu o conteúdo de `01_CARGA_INICIAL`.
+
+- **Resultado:** conexão OAuth concluída e primeira sincronização com status `success`: 6 arquivos listados e processados, 0 falhas. Papéis corretos: `Ata_registro.xlsx` como registro (aba Atividades, indicada pelo `INDEX.md`), três documentos de direção, uma ata e um histórico. ACT-101 a ACT-104 importadas, com ACT-104 compartilhada por Ana e Davi e ACT-103 bloqueada.
+- **Problema encontrado no caminho:** o Google respondeu `403 access_denied` porque a conta não tinha sido salva como usuária de teste. Depois que ela foi adicionada, a autorização funcionou. O README alerta para esse ponto.
+
 ## O que não foi validado ao vivo
 
-- **Google Drive real:** o adaptador foi testado com cliente falso (paginação, subpastas, 401, 403, 429 e exportação). A conexão OAuth real depende das credenciais da pessoa candidata e deve ser feita antes da demonstração (README, seção "Conectar o Google Drive").
-- **Claude real:** o caminho com a API foi testado com cliente falso (formato da requisição, recusa, indisponibilidade e fallback). Nenhuma chave foi usada no desenvolvimento. Com `ANTHROPIC_API_KEY` configurada, o mesmo validador se aplica à saída real.
+- **Claude real:** o caminho com a API foi testado com cliente falso (formato da requisição, recusa, indisponibilidade e fallback). Nenhuma chamada foi feita à API. O modelo padrão é o `claude-haiku-4-5`, que não aceita o parâmetro `effort`; o código o omite para esse modelo e um teste cobre isso.

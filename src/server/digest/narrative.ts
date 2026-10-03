@@ -1,7 +1,7 @@
 import { formatDate } from '../../shared/dates.ts';
 import { ACTIVITY_FIELD_LABELS, ACTIVITY_STATUS_LABELS, type ActivityField, type ActivityStatus, type Digest, type DigestChange, type FieldValue } from '../../shared/domain.ts';
 import { errorMessage } from '../lib/errors.ts';
-import type { ClaudeMessagesClient } from '../suggestions/claude-analyzer.ts';
+import { effortConfig, type ClaudeMessagesClient } from '../suggestions/claude-analyzer.ts';
 
 /**
  * Short prose version of the digest. Facts always come from the structured
@@ -103,7 +103,7 @@ export class ClaudeNarrator implements DigestNarrator {
         model: this.model,
         max_tokens: 2000,
         system: NARRATIVE_SYSTEM_PROMPT,
-        output_config: { effort: 'low' },
+        output_config: effortConfig(this.model),
         messages: [{ role: 'user', content: `Pessoa: ${memberName}\n<resumo>${JSON.stringify(digest)}</resumo>` }],
       });
       const text = response.content.flatMap((block) => (block.type === 'text' ? [block.text] : [])).join('').trim();
