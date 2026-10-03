@@ -9,6 +9,7 @@ import { extractContent } from '../src/server/ingestion/extract.ts';
 import { readWorkbook } from '../src/server/ingestion/spreadsheet.ts';
 import { errorMessage } from '../src/server/lib/errors.ts';
 import { neutralizeTags } from '../src/server/suggestions/claude-analyzer.ts';
+import { datesAreGrounded, digestForModel } from '../src/server/digest/narrative.ts';
 import type { RawProposal } from '../src/server/suggestions/contract.ts';
 import { dateMentioned, validateProposals } from '../src/server/suggestions/validator.ts';
 import {
@@ -227,5 +228,64 @@ describe('security hardening', () => {
     const descriptions = world.container.repos.conflicts.list().map((c) => c.description).join(' ');
     expect(descriptions).toMatch(/o ID ACT-101 se repete/);
     expect(descriptions).toMatch(/sem ID ou sem título/);
+  });
+});
+
+describe('findings from live tests with Claude Haiku 4.5', () => {
+  const ctx = (documentText: string) => ({
+    documentText,
+    documentDate: '2026-10-03',
+    activities: [
+      {
+        id: 'ACT-101', title: 'Preparar carrossel', description: '', nextStep: 'Preparar roteiro', ownerIds: ['U-A'], front: 'Growth',
+        status: 'in_progress' as const, dueDate: '2026-10-05', unresolvedOwners: [], priority: null, notes: null, origin: 'import' as const,
+        createdAt: '', updatedAt: '', createdBy: 'system', version: 1, pendingSuggestionIds: [], refs: [],
+      },
+    ],
+    members: [{ id: 'U-A', displayName: 'Ana', front: 'Growth', role: 'member' as const, description: '' }],
+    lastHumanChangeAt: () => null,
+  });
+  const minutes = 'O prazo mudou de 2026-10-05 para **2026-10-07**. Bruno aprovará a versão final. Próximo passo de Ana: fechar o roteiro.';
+  const base = { kind: 'update' as const, target_activity_id: 'ACT-101', title: null, owners: ['Ana'], next_step: null, status: null, reason: '', uncertainties: [] };
+
+  it('accepts evidence made of non-contiguous sentences that are each literally in the document', () => {
+    const result = validateProposals(
+      [{ ...base, due_date: '2026-10-07', evidence: 'O prazo mudou de 2026-10-05 para **2026-10-07**. Próximo passo de Ana: fechar o roteiro.' }],
+      ctx(minutes),
+    );
+    expect(result.drafts[0]?.proposed.dueDate).toBe('2026-10-07');
+  });
+
+  it('still rejects composed evidence when any sentence is invented', () => {
+    const result = validateProposals(
+      [{ ...base, due_date: '2026-10-07', evidence: 'O prazo mudou de 2026-10-05 para **2026-10-07**. Ana pediu mais uma semana de folga.' }],
+      ctx(minutes),
+    );
+    expect(result.drafts).toEqual([]);
+  });
+
+  it('narrative grounding also checks dates written as "7 de outubro"', () => {
+    const digest = { confirmed: [], dueDate: '2026-10-05' } as unknown as Parameters<typeof datesAreGrounded>[1];
+    expect(datesAreGrounded('Seu prazo é 5 de outubro.', digest)).toBe(true);
+    expect(datesAreGrounded('Seu prazo é 20 de dezembro.', digest)).toBe(false);
+  });
+
+  it('the model never sees internal member ids in the digest it summarizes', () => {
+    const view = digestForModel({ since: '1970-01-01T00:00:00.000Z', nothingChanged: false, confirmed: [], pending: [], dueSoon: [], blocked: [], uncertain: [], overdue: [{ id: 'ACT-1', title: 'X', dueDate: '2026-10-01', ownerIds: ['U-A', 'U-D'] }] } as unknown as Parameters<typeof digestForModel>[0], (id: string) => (id === 'U-A' ? 'Ana' : 'Davi'));
+    expect(view).toContain('Ana');
+    expect(view).not.toMatch(/U-[A-Z]/);
+  });
+});
+
+describe('narrative input keeps confirmed and pending facts apart', () => {
+  it('labels the only non-official list explicitly and uses titles and names', () => {
+    const digest = {
+      memberId: 'U-A', since: '1970-01-01T00:00:00.000Z', generatedAt: '', nothingChanged: false,
+      confirmed: [{ activityId: 'ACT-104', activityTitle: 'Revisar fluxo', timestamp: '2026-10-03T10:00:00Z', actorName: 'Sistema', kind: 'imported', changes: [], reason: null, source: null }],
+      pending: [], overdue: [], dueSoon: [], blocked: [], uncertain: [], documents: [],
+    } as unknown as Parameters<typeof digestForModel>[0];
+    const view = JSON.parse(digestForModel(digest, (id: string) => id));
+    expect(view.propostas_pendentes_nao_oficiais).toEqual([]);
+    expect(view.mudancas_confirmadas_oficiais[0]).toMatchObject({ atividade: 'ACT-104 — Revisar fluxo', tipo: 'importada do registro' });
   });
 });

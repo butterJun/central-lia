@@ -1,36 +1,47 @@
 # Central da Liga IA — contexto, onboarding e atividades
 
-Protótipo do case técnico da Liga de Inteligência Artificial da UFSCar. Uma aplicação web que lê uma pasta do Google Drive e responde a duas perguntas de cada membro:
+A Central da Liga IA é uma aplicação web para a Liga de Inteligência Artificial da UFSCar. Ela lê a pasta de trabalho da Liga no Google Drive (atas, planilha de atividades e documentos de direção) e responde a duas perguntas de cada membro:
 
 - **"O que preciso fazer agora?"** Atividades com responsável, prazo, estado, próximo passo e fonte, com filtros e visão pessoal.
-- **"O que mudou desde a última vez?"** Documentos novos ou alterados no Drive viram **sugestões verificáveis** (trecho literal e link). Uma pessoa revisora aceita, ajusta ou rejeita cada uma, e o resumo pessoal separa o que é fato confirmado do que ainda é proposta.
+- **"O que mudou desde a última vez?"** Documentos novos ou alterados no Drive viram **sugestões verificáveis**, com o trecho literal e o link do original. Uma pessoa revisora aceita, ajusta ou rejeita cada uma, e o resumo pessoal separa fatos confirmados de propostas.
 
-Todos os dados deste repositório são **fictícios** (pacote do case).
+## Principais recursos
+
+- **Sincronização automática com o Google Drive:** acesso somente leitura à pasta configurada e às subpastas, com detecção de arquivos novos, editados, renomeados, removidos ou sem acesso.
+- **Registro oficial de atividades:** criação e edição pela interface, com histórico completo (autor, hora, campos alterados e fonte) e proteção contra edições simultâneas.
+- **Leitura assistida de atas com IA (Claude):** propõe criar ou atualizar atividades e nunca altera nada sem revisão humana. Um validador determinístico rejeita evidências inventadas, prazos ou responsáveis não escritos no texto e hipóteses vagas.
+- **Regras de autoridade:** a planilha indicada pelo índice é a fonte inicial; planilhas parecidas, vazias ou contraditórias geram conflitos visíveis, nunca apagam dados.
+- **"Comece aqui":** página para quem acaba de chegar, montada a partir dos documentos de direção, com o que ainda está "a confirmar" marcado como tal.
+- **Resumo "o que mudou para mim":** separa confirmado, proposto e incerto, sempre com links para as fontes.
+- **Interface acessível:** contraste WCAG AA medido, navegação por teclado, uso no celular e a identidade visual da Liga.
 
 ---
 
-## Execução rápida (sem Google, para avaliação)
+## Experimente em 2 minutos (modo demonstração, sem Google)
 
 Requisitos: **Node.js 22.13 ou superior** (testado com 24 LTS).
 
 ```bash
 npm install
+```
+
+```bash
 npm run demo
 ```
 
-Abra **http://localhost:4000**. O modo demo usa a pasta `demo-drive/` no lugar do Drive e já carrega `01_CARGA_INICIAL`. Com o servidor rodando, simule os eventos do pacote em outro terminal. Eles são detectados pela sincronização automática (2 min) ou pelo botão **Sincronizar agora**:
+Abra **http://localhost:4000**. O modo demonstração usa a pasta local `demo-drive/` no lugar do Drive e carrega dados de exemplo de uma organização **fictícia** (em `fixtures/drive/`). Com o servidor rodando, simule novos documentos em outro terminal; eles são detectados pela sincronização automática (2 min) ou pelo botão **Sincronizar agora**:
 
 ```bash
 npm run demo:drive add-minutes
 ```
 
-Esse passo adiciona as atas de 03/10 e 04/10. A de 03/10 entra como Google Docs nativo simulado (`.gdoc`), e o `.docx` original aparece como "não processado".
+Esse passo adiciona duas atas novas. Uma delas entra como Google Docs nativo simulado (`.gdoc`), e o `.docx` original aparece como "não processado".
 
 ```bash
 npm run demo:drive add-conflict
 ```
 
-Esse passo adiciona a planilha vazia homônima.
+Esse passo adiciona uma planilha vazia com nome parecido com o registro oficial.
 
 ```bash
 npm run demo:drive edit-minutes
@@ -38,9 +49,9 @@ npm run demo:drive edit-minutes
 
 Esse passo edita uma ata já conhecida.
 
-`npm run demo` recria a pasta e o banco da demo a cada execução; `npm run demo:start` reinicia **mantendo** os dados. Para desenvolvimento com recarga automática, use `npm run dev` (interface em http://localhost:5173).
+`npm run demo` recria a pasta e o banco da demonstração a cada execução; `npm run demo:start` reinicia **mantendo** os dados. Para desenvolvimento com recarga automática, use `npm run dev` (interface em http://localhost:5173).
 
-### Roteiro sugerido (5–8 min)
+### Tour guiado
 
 1. **Comece aqui** como "Novo membro": propósito marcado como provisório, frentes, fonte das atividades, regra de precedência e lacunas.
 2. Como **Ana**: visão geral e "Minhas atividades" (ACT-101 e ACT-104). Troque para **Davi** e veja a lista mudar sem alterar os dados.
@@ -55,16 +66,16 @@ Esse passo edita uma ata já conhecida.
 
 ---
 
-## Conectar o Google Drive (modo real)
+## Conectar ao Google Drive
 
-1. Siga `04_Guia_Google_Drive_API` do pacote:
-   - crie um projeto no Google Cloud e ative a **Google Drive API**;
-   - configure a tela de consentimento (**External**, em **Testing**, com o seu e-mail como usuário de teste);
-   - crie um cliente OAuth do tipo **Web application**.
-2. No cliente OAuth, cadastre:
+1. **Google Cloud:**
+   - crie um projeto e ative a **Google Drive API** (APIs e serviços › Biblioteca);
+   - em **Google Auth Platform**, configure a tela de consentimento. Para uso interno de uma organização Google Workspace, escolha **Interno**. Com contas pessoais, escolha **Externo** em modo **Testing** e cadastre cada pessoa em **Público-alvo › Usuários de teste**;
+   - crie um cliente OAuth do tipo **Aplicativo da Web**.
+2. No cliente OAuth, cadastre a origem e o redirecionamento do endereço onde a Central vai rodar. Para uso local:
    - origem: `http://localhost:4000`
    - URI de redirecionamento: `http://localhost:4000/auth/google/callback`
-3. Crie no seu Drive a pasta `LIA case teste` e envie o conteúdo de `fixtures/drive/01_CARGA_INICIAL`. O ID da pasta é o trecho final da URL `drive.google.com/drive/folders/<ID>`.
+3. Identifique a pasta da Liga no Drive. O ID é o trecho final da URL `drive.google.com/drive/folders/<ID>`. Para testar antes de usar a pasta real, crie uma pasta e envie o conteúdo de `fixtures/drive/01_CARGA_INICIAL`.
 4. Crie o arquivo de configuração:
 
    ```bash
@@ -77,6 +88,8 @@ Esse passo edita uma ata já conhecida.
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
 
+   Para ativar a leitura de atas com IA, preencha também `ANTHROPIC_API_KEY`.
+
 5. Compile e inicie:
 
    ```bash
@@ -87,7 +100,7 @@ Esse passo edita uma ata já conhecida.
    npm start
    ```
 
-6. Abra **Estado da sincronização → Conectar Google Drive** e autorize. Se o Google responder `403 access_denied`, a conta não está em **Público-alvo → Usuários de teste**: adicione-a e confira se ela aparece na lista depois de salvar. Depois, adicione as atas **diretamente no Drive**. Converta `Ata_2026-10-03.docx` em Google Docs, como pede o pacote.
+6. Abra **Estado da sincronização → Conectar Google Drive** e autorize. Se o Google responder `403 access_denied`, a conta não está em **Público-alvo › Usuários de teste**: adicione-a e confira se ela aparece na lista depois de salvar. A partir daí, documentos adicionados ou editados **diretamente no Drive** aparecem na Central. Arquivos Word (`.docx`) precisam ser convertidos em Google Docs no próprio Drive.
 
 Detalhes do acesso:
 
@@ -220,8 +233,8 @@ Esse comando roda typecheck, testes e build.
 npm run test:coverage
 ```
 
-- 117 testes automatizados: ingestão dos arquivos reais do case, analisador e validador (incluindo injeção de prompt), sincronização ponta a ponta, revisão, persistência após reinício, resumo, onboarding, API HTTP, adaptador Google (cliente falso), Claude (cliente falso), OAuth, agendador e componentes da interface.
-- Cobertura do servidor: **89,0%** das instruções e **92,8%** das linhas.
+- 123 testes automatizados: ingestão dos arquivos de exemplo, analisador e validador (incluindo injeção de prompt), sincronização ponta a ponta, revisão, persistência após reinício, resumo, onboarding, API HTTP, adaptador Google (cliente falso), Claude (cliente falso), OAuth, agendador e componentes da interface.
+- Cobertura do servidor: **89,0%** das instruções e **92,7%** das linhas.
 - Acessibilidade:
   - contraste medido (o menor par de texto é 5,5:1);
   - foco visível e navegação por teclado, com link "pular para o conteúdo";
@@ -232,7 +245,7 @@ npm run test:coverage
 
 ## Limitações conhecidas
 
-- **Claude não validado com a API real:** o caminho do Claude foi testado com um cliente falso; nenhuma chamada foi feita à API durante o desenvolvimento. A integração com o Google Drive real foi validada (veja [docs/VALIDACAO.md](docs/VALIDACAO.md)).
+- **IA:** a leitura de atas e o resumo foram validados com o Claude Haiku 4.5 e com o Google Drive reais (veja [docs/VALIDACAO.md](docs/VALIDACAO.md)), mas com poucos documentos. Antes de confiar em escala, vale montar um conjunto de atas reais anonimizadas para medir a precisão.
 - **Leitor por regras:** só entende padrões explícitos (IDs, nomes com verbo no futuro, datas ISO, "Próximo passo:"). Atas muito livres, sem chave de API, geram menos sugestões, mas nunca sugestões sem lastro.
 - **Datas relativas:** "até sexta" fica como prazo a definir (decisão intencional da especificação).
 - **Modo pasta local:** renomear um arquivo gera um ID novo. No Drive real o ID é estável.
@@ -264,7 +277,7 @@ src/server/
   http/            rotas Fastify
 src/web/           interface React (páginas, componentes, estilos)
 tests/             testes (Vitest)
-fixtures/drive/    dados fictícios do case
+fixtures/drive/    dados de exemplo (organização fictícia)
 scripts/           preparação da pasta de demonstração
 docs/              ADRs, registro de validação, diário de bordo
 ```

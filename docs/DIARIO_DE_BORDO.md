@@ -17,7 +17,7 @@ Registro curto de como o trabalho foi conduzido: decisões, mudanças de direç�
 
 ## Construção e verificação
 
-- Desenvolvimento incremental com testes a cada módulo: ingestão, analisador e validador, sincronização, revisão, atividades, resumo, API, Google (fake), Claude (fake), configuração e OAuth, interface. Ao final: 117 testes, cobertura de 89,0% das instruções e 92,8% das linhas.
+- Desenvolvimento incremental com testes a cada módulo: ingestão, analisador e validador, sincronização, revisão, atividades, resumo, API, Google (fake), Claude (fake), configuração e OAuth, interface. Ao final: 123 testes, cobertura de 89,0% das instruções e 92,7% das linhas.
 - Validação manual no navegador: perfis, sugestão aceita por Bruno, histórico, "Comece aqui", sincronização, celular (375 px) e contraste. Medi todos os pares de cor: o menor contraste de texto é 5,5:1.
 
 ## Revisão independente

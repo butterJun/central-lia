@@ -61,7 +61,7 @@ function validateOne(proposal: RawProposal, context: ValidationContext, normaliz
   if (proposal.kind === 'no_action') {
     return reject(proposal, proposal.reason || 'Sem decisão ou ação atribuída: não vira atividade.');
   }
-  if (!evidence || !normalizedDocument.includes(normalizeForEvidence(evidence))) {
+  if (!evidence || !isLiteralExcerpt(normalizedDocument, evidence)) {
     return reject(proposal, 'Descartada: o trecho de evidência não foi encontrado literalmente no documento.');
   }
   if (evidence.length < MIN_EVIDENCE_CHARS || contentTokens(evidence).size < MIN_EVIDENCE_WORDS) {
@@ -81,6 +81,24 @@ function validateOne(proposal: RawProposal, context: ValidationContext, normaliz
   return target
     ? buildUpdate(proposal, target, fields, evidence, uncertainties, context)
     : buildCreate(proposal, fields, evidence, uncertainties, context);
+}
+
+const SENTENCE_BREAK = /(?<=[.!?;])\s+|\s*(?:\.\.\.|…)\s*/;
+const MIN_SENTENCE_CHARS = 10;
+
+/**
+ * The evidence is a literal excerpt: either one contiguous passage, or several
+ * sentences quoted together (models often skip an irrelevant sentence in between),
+ * each of which must appear verbatim in the document.
+ */
+export function isLiteralExcerpt(normalizedDocument: string, evidence: string): boolean {
+  if (normalizedDocument.includes(normalizeForEvidence(evidence))) return true;
+  const sentences = evidence
+    .split(SENTENCE_BREAK)
+    .map((sentence) => normalizeForEvidence(sentence))
+    .filter((sentence) => sentence.length > 0);
+  if (sentences.length < 2 || sentences.some((sentence) => sentence.length < MIN_SENTENCE_CHARS)) return false;
+  return sentences.every((sentence) => normalizedDocument.includes(sentence));
 }
 
 function resolveTarget(proposal: RawProposal, activities: Activity[]): Activity | undefined {
