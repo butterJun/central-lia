@@ -36,7 +36,21 @@ Segui TDD para cada achado:
 
 A tabela completa está em [VALIDACAO.md](VALIDACAO.md).
 
+## 2026-10-03 — Testes com o Google Drive e o Claude reais
+
+- **Google Drive:** criei um projeto próprio no Google Cloud, com a tela de consentimento em modo Testing e um cliente OAuth Web. Conectei uma pasta minha, separada da pasta compartilhada do case, com uma cópia dos arquivos.
+  - **Carga inicial:** 6 arquivos processados e 4 atividades importadas.
+  - **Arquivo novo:** depois, enviei a ata de 03/10 direto no Drive e a converti em Google Docs. A rodada automática seguinte a detectou e criou a sugestão de atualização do ACT-101, sem nenhum clique na aplicação.
+- **Tropeço no OAuth:** a primeira autorização falhou com `403 access_denied`, porque a conta não tinha ficado salva como usuária de teste. Corrigi e anotei o alerta no README.
+- **Escolha do modelo:** passei o padrão para o **Claude Haiku 4.5**, o mais econômico da linha atual (cerca de US$ 1 por mês no uso estimado). Extrair campos de atas curtas não exige raciocínio profundo, e o validador determinístico compensa erros. Esse modelo não aceita o parâmetro `effort`, e o código foi ajustado para omiti-lo.
+
 ## Uma decisão que mudei depois de ver uma saída incorreta
+
+**Com o Claude real.** No primeiro teste com a API, a sugestão principal, de mudar o prazo do ACT-101, simplesmente não apareceu. Investigando a saída bruta, vi que o Haiku citou duas frases da ata pulando a do meio. Cada frase existia no documento, mas o meu validador exigia um trecho contínuo e descartou a proposta. Mudei a regra: a evidência pode reunir várias frases, desde que cada uma exista literalmente, e uma frase inventada continua derrubando a proposta.
+
+No mesmo teste, o resumo em texto chamou uma atividade oficial de "proposta pendente" e vazou um identificador interno ("U-D"). Mudei o que o modelo recebe: listas rotuladas ("confirmadas e oficiais" × "propostas pendentes, não oficiais") e nomes no lugar de IDs. Depois da mudança, os resumos saíram corretos nos dois cenários testados.
+
+**No leitor por regras.**
 
 Ao escrever os testes da ata de 03/10, a primeira versão do leitor de responsáveis tratava qualquer nome seguido de verbo no futuro como responsável. "Bruno aprovará a versão final" fazia de Bruno o responsável por ACT-101, o que está errado: ele aprova, não executa. O mesmo risco existe com o modelo de linguagem. Mudei em três lugares:
 
