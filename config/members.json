@@ -1,0 +1,37 @@
+[
+  {
+    "id": "U-A",
+    "displayName": "Ana",
+    "front": "Growth",
+    "role": "member",
+    "description": "Membro de Growth, prepara conteúdos"
+  },
+  {
+    "id": "U-B",
+    "displayName": "Bruno",
+    "front": "Growth",
+    "role": "reviewer",
+    "description": "Líder de Growth, aprova posts e revisa sugestões"
+  },
+  {
+    "id": "U-C",
+    "displayName": "Carla",
+    "front": "Formação",
+    "role": "reviewer",
+    "description": "Organiza oficinas e revisa sugestões"
+  },
+  {
+    "id": "U-D",
+    "displayName": "Davi",
+    "front": "Operações",
+    "role": "member",
+    "description": "Cuida do checklist de entrada de novos membros"
+  },
+  {
+    "id": "U-N",
+    "displayName": "Novo membro",
+    "front": "A definir",
+    "role": "member",
+    "description": "Perfil de demonstração de quem acabou de chegar"
+  }
+]
