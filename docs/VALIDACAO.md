@@ -62,6 +62,7 @@ Rodei uma revisão de código e uma de segurança com os agentes `code-reviewer`
 Projeto próprio no Google Cloud ("Central LIA case teste"), cliente OAuth Web, app em modo Testing e escopo `drive.readonly`. A pasta "LIA case teste" recebeu o conteúdo de `01_CARGA_INICIAL`.
 
 - **Resultado:** conexão OAuth concluída e primeira sincronização com status `success`: 6 arquivos listados e processados, 0 falhas. Papéis corretos: `Ata_registro.xlsx` como registro (aba Atividades, indicada pelo `INDEX.md`), três documentos de direção, uma ata e um histórico. ACT-101 a ACT-104 importadas, com ACT-104 compartilhada por Ana e Davi e ACT-103 bloqueada.
+- **Arquivo adicionado direto no Drive (R03):** `Ata_2026-10-03.docx` foi enviado e convertido em Google Docs pelo próprio Drive, sem upload pela aplicação. A **rodada automática** seguinte detectou o Google Doc, leu sua exportação em Markdown e criou a sugestão de **atualização** de ACT-101 (prazo 05/10 → 07/10 e próximo passo). O valor oficial permaneceu em 05/10, com a atualização pendente. O `.docx` original apareceu como "não processado", com o motivo.
 - **Problema encontrado no caminho:** o Google respondeu `403 access_denied` porque a conta não tinha sido salva como usuária de teste. Depois que ela foi adicionada, a autorização funcionou. O README alerta para esse ponto.
 
 ## O que não foi validado ao vivo
