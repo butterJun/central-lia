@@ -6,7 +6,7 @@ escopo: pasta de teste do case
 
 ## Comece por aqui
 
-- `ESTADO-ATUAL.md`: resumo provisório das informações da organização fictícia.
+- `ESTADO-ATUAL.md`: resumo provisório das informações da organização.
 - `GUIA_INICIAL.md`: visão introdutória das frentes, papéis e aprovação de conteúdo.
 - `Ata_registro.xlsx`, aba `Atividades`: **fonte inicial e provisória das atividades identificadas por ACT-***.
 - `Ata_2026-10-01.md`: ata com contexto histórico da criação de atividades.

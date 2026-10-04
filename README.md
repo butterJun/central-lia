@@ -29,7 +29,7 @@ npm install
 npm run demo
 ```
 
-Abra **http://localhost:4000**. O modo demonstração usa a pasta local `demo-drive/` no lugar do Drive e carrega dados de exemplo de uma organização **fictícia** (em `fixtures/drive/`). Com o servidor rodando, simule novos documentos em outro terminal; eles são detectados pela sincronização automática (2 min) ou pelo botão **Sincronizar agora**:
+Abra **http://localhost:4000**. O modo demonstração usa a pasta local `demo-drive/` no lugar do Drive e carrega **dados de exemplo** da Liga (em `fixtures/drive/`): pessoas, atividades e atas criadas para teste. Com o servidor rodando, simule novos documentos em outro terminal; eles são detectados pela sincronização automática (2 min) ou pelo botão **Sincronizar agora**:
 
 ```bash
 npm run demo:drive add-minutes
@@ -277,7 +277,7 @@ src/server/
   http/            rotas Fastify
 src/web/           interface React (páginas, componentes, estilos)
 tests/             testes (Vitest)
-fixtures/drive/    dados de exemplo (organização fictícia)
+fixtures/drive/    dados de exemplo para demonstração e testes
 scripts/           preparação da pasta de demonstração
 docs/              ADRs, registro de validação, diário de bordo
 ```

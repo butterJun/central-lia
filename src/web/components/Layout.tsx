@@ -117,7 +117,8 @@ export function Layout({ children }: { children: ReactNode }) {
       </main>
       <footer className="footer">
         <div className="footer-inner">
-          Dados fictícios do case técnico. Pasta monitorada: {status?.folder?.name ?? '—'} e subpastas · Fuso: America/São Paulo
+          {status?.mode === 'local' ? 'Modo demonstração, com dados de exemplo. ' : ''}Pasta monitorada:{' '}
+          {status?.folder?.name ?? '—'} e subpastas · Fuso: America/São Paulo
         </div>
       </footer>
     </>

@@ -46,7 +46,7 @@ export function RequireMember({ children }: { children: ReactNode }) {
     <div className="card card-accent">
       <h2>Quem é você nesta demonstração?</h2>
       <p className="muted">
-        Escolha um perfil fictício para ver as atividades e novidades dessa pessoa. Primeira vez? Veja também{' '}
+        Escolha um perfil de exemplo para ver as atividades e novidades dessa pessoa. Primeira vez? Veja também{' '}
         <Link to="/comece-aqui">Comece aqui</Link>.
       </p>
       <div className="row">

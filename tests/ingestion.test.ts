@@ -45,7 +45,7 @@ describe('document metadata', () => {
   it('splits sections and strips the metadata block', () => {
     const guide = readFixture(INITIAL_LOAD_DIR, 'GUIA_INICIAL.md');
     expect(splitSections(guide).map((s) => s.heading)).toEqual(['Comece aqui', 'Para um membro novo', 'Frentes e pessoas']);
-    expect(stripMetaBlock(readFixture(INITIAL_LOAD_DIR, 'ESTADO-ATUAL.md'))).toMatch(/^Esta organização fictícia/);
+    expect(stripMetaBlock(readFixture(INITIAL_LOAD_DIR, 'ESTADO-ATUAL.md'))).toMatch(/^Esta organização treina pessoas/);
   });
 });
 
