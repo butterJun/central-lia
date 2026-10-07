@@ -15,6 +15,7 @@
     "demo": "tsx scripts/demo-drive.ts reset && vite build && tsx src/server/index.ts --demo",
     "demo:start": "tsx src/server/index.ts --demo",
     "demo:drive": "tsx scripts/demo-drive.ts",
+    "stop": "tsx scripts/stop-server.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",

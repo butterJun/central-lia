@@ -49,7 +49,7 @@ npm run demo:drive edit-minutes
 
 Esse passo edita uma ata já conhecida.
 
-`npm run demo` recria a pasta e o banco da demonstração a cada execução; `npm run demo:start` reinicia **mantendo** os dados. Para desenvolvimento com recarga automática, use `npm run dev` (interface em http://localhost:5173).
+`npm run demo` recria a pasta e o banco da demonstração a cada execução; `npm run demo:start` reinicia **mantendo** os dados. Para parar o servidor de qualquer terminal, use `npm run stop`: ele encerra o processo da Central na porta configurada (padrão 4000) e não mexe em outro programa que esteja nessa porta. Para desenvolvimento com recarga automática, use `npm run dev` (interface em http://localhost:5173).
 
 ### Tour guiado
 
